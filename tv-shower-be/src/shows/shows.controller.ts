@@ -32,11 +32,11 @@ export class ShowsController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateShowDto: UpdateShowDto) {
-    return this.showsService.update(+id, updateShowDto);
+    return this.showsService.update(id, updateShowDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.showsService.remove(+id);
+    return this.showsService.remove(id);
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { CreateShowDto } from './dto/create-show.dto';
 import { UpdateShowDto } from './dto/update-show.dto';
 import { Show } from 'src/shows/entities/show.entity';
@@ -7,7 +8,7 @@ import { Show } from 'src/shows/entities/show.entity';
 export class ShowsService {
   private showsList: Show[] = [
     {
-      id: '0',
+      id: uuidv4(),
       title: 'Peaky Blinders',
       coverUrl:
         'https://m.media-amazon.com/images/M/MV5BZjYzZDgzMmYtYjY5Zi00YTk1LThhMDYtNjFlNzM4MTZhYzgyXkEyXkFqcGdeQXVyMTE5NDQ1MzQ3._V1_.jpg',
@@ -15,8 +16,13 @@ export class ShowsService {
     },
   ];
 
-  create(createShowDto: CreateShowDto) {
-    return 'This action adds a new show';
+  create(createShowDto: CreateShowDto): Show {
+    const newShow = {
+      id: uuidv4(),
+      ...createShowDto,
+    };
+    this.showsList.push(newShow);
+    return newShow;
   }
 
   findAll(): Show[] {
@@ -27,11 +33,22 @@ export class ShowsService {
     return this.showsList.find((s: Show) => s.id === id);
   }
 
-  update(id: number, updateShowDto: UpdateShowDto) {
-    return `This action updates a #${id} show`;
+  update(id: string, updateShowDto: UpdateShowDto): Show {
+    const idx = this.showsList.findIndex((s: Show) => s.id === id);
+    if (idx < 0) throw new Error(`No TV show with id: ${id} found`);
+
+    const updatedShow = {
+      ...this.showsList[idx],
+      ...updateShowDto,
+    };
+    this.showsList[idx] = updatedShow;
+    return updatedShow;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} show`;
+  remove(id: string): void {
+    const idx = this.showsList.findIndex((s: Show) => s.id === id);
+    if (idx < 0) throw new Error(`No TV show with id: ${id} found`);
+
+    this.showsList.splice(idx, 1);
   }
 }
